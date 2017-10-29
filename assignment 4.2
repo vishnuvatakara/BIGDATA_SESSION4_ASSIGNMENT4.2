@@ -1,0 +1,364 @@
+
+
+grunt> A = load '/vishnu/television.txt' using PigStorage ('|') as (cmp:chararray,mod:chararray,size:int,state:chararray,pin:long,price:long);
+
+(Samsung,Optima,14,Madhya Pradesh,132401,14200)
+(Onida,Lucid,18,Uttar Pradesh,232401,16200)
+(Akai,Decent,16,Kerala,922401,12200)
+(Lava,Attention,20,Assam,454601,24200)
+(Zen,Super,14,Maharashtra,619082,9200)
+(Samsung,Optima,14,Madhya Pradesh,132401,14200)
+(Onida,Lucid,18,Uttar Pradesh,232401,16200)
+(Onida,Decent,14,Uttar Pradesh,232401,16200)
+(Onida,NA,16,Kerala,922401,12200)
+(Lava,Attention,20,Assam,454601,24200)
+(Zen,Super,14,Maharashtra,619082,9200)
+(Samsung,Optima,14,Madhya Pradesh,132401,14200)
+(NA,Lucid,18,Uttar Pradesh,232401,16200)
+(Samsung,Decent,16,Kerala,922401,12200)
+(Lava,Attention,20,Assam,454601,24200)
+(Samsung,Super,14,Maharashtra,619082,9200)
+(Samsung,Super,14,Maharashtra,619082,9200)
+(Samsung,Super,14,Maharashtra,619082,9200)
+=====================
+grunt> describe A;
+A: {cmp: chararray,mod: chararray,size: int,state: chararray,pin: long,price: long}
+grunt> 
+==============================
+1]CONCAT
+
+Concatenates two fields of type chararray or two fields of type bytearray.The data type of the two elements must be the same, either chararray or bytearray.
+Syntax
+CONCAT(expression,expression)
+An expression with data types chararray or bytearray.
+
+
+grunt> B = foreach A generate CONCAT(cmp,mod);
+grunt> dump B;
+(SamsungOptima)
+(OnidaLucid)
+(AkaiDecent)
+(LavaAttention)
+(ZenSuper)
+(SamsungOptima)
+(OnidaLucid)
+(OnidaDecent)
+(OnidaNA)
+(LavaAttention)
+(ZenSuper)
+(SamsungOptima)
+(NALucid)
+(SamsungDecent)
+(LavaAttention)
+(SamsungSuper)
+(SamsungSuper)
+(SamsungSuper)
+===============================
+2]TOKENIZE
+It is used to split a string of words (all words in a single tuple) into a bag of words (each word in a single tuple). The following characters are considered to be word separators: space, double quote("), coma(,) parenthesis(()), star(*).
+Syntax
+TOKENIZE(expression)
+An expression with data type chararray.
+
+grunt> X = foreach A generate TOKENIZE(state);
+grunt> dump X;
+cess : 1
+({(Madhya),(Pradesh)})
+({(Uttar),(Pradesh)})
+({(Kerala)})
+({(Assam)})
+({(Maharashtra)})
+({(Madhya),(Pradesh)})
+({(Uttar),(Pradesh)})
+({(Uttar),(Pradesh)})
+({(Kerala)})
+({(Assam)})
+({(Maharashtra)})
+({(Madhya),(Pradesh)})
+({(Uttar),(Pradesh)})
+({(Kerala)})
+({(Assam)})
+({(Maharashtra)})
+({(Maharashtra)})
+({(Maharashtra)})
+=============================================
+3]SUM
+It is used to compute the sum of a set of numeric values in a single-column bag. SUM requires a preceding GROUP ALL statement for global sums and a GROUP BY statement for group sums.
+Syntax
+SUM(expression)
+An expression with data types int, long, float, double, or bytearray cast as double.
+
+grunt> B = group A by cmp;
+grunt> dump B;
+cess : 1
+(NA,{(NA,Lucid,18,Uttar Pradesh,232401,16200)})
+(Zen,{(Zen,Super,14,Maharashtra,619082,9200),(Zen,Super,14,Maharashtra,619082,9200)})
+(Akai,{(Akai,Decent,16,Kerala,922401,12200)})
+(Lava,{(Lava,Attention,20,Assam,454601,24200),(Lava,Attention,20,Assam,454601,24200),(Lava,Attention,20,Assam,454601,24200)})
+(Onida,{(Onida,Lucid,18,Uttar Pradesh,232401,16200),(Onida,Lucid,18,Uttar Pradesh,232401,16200),(Onida,NA,16,Kerala,922401,12200),(Onida,Decent,14,Uttar Pradesh,232401,16200)})
+(Samsung,{(Samsung,Super,14,Maharashtra,619082,9200),(Samsung,Super,14,Maharashtra,619082,9200),(Samsung,Super,14,Maharashtra,619082,9200),(Samsung,Decent,16,Kerala,922401,12200),(Samsung,Optima,14,Madhya Pradesh,132401,14200),(Samsung,Optima,14,Madhya Pradesh,132401,14200),(Samsung,Optima,14,Madhya Pradesh,132401,14200)})
+
+grunt> X = foreach B generate group,SUM(A.price);
+grunt> dump X;
+
+cess : 1
+(NA,16200)
+(Zen,18400)
+(Akai,12200)
+(Lava,72600)
+(Onida,60800)
+(Samsung,82400)
+grunt> 
+==========================
+4]MIN
+It is used to compute the minimum of a set of numeric values or chararrays in a single-column bag.  MIN requires a preceding GROUP… ALL statement for global minimums and a GROUP … BY statement for group minimums.
+Syntax
+MIN(expression)
+An expression with data types int, long, float, double, or chararray.
+
+grunt> dump B;
+cess : 1
+(NA,{(NA,Lucid,18,Uttar Pradesh,232401,16200)})
+(Zen,{(Zen,Super,14,Maharashtra,619082,9200),(Zen,Super,14,Maharashtra,619082,9200)})
+(Akai,{(Akai,Decent,16,Kerala,922401,12200)})
+(Lava,{(Lava,Attention,20,Assam,454601,24200),(Lava,Attention,20,Assam,454601,24200),(Lava,Attention,20,Assam,454601,24200)})
+(Onida,{(Onida,Lucid,18,Uttar Pradesh,232401,16200),(Onida,Lucid,18,Uttar Pradesh,232401,16200),(Onida,NA,16,Kerala,922401,12200),(Onida,Decent,14,Uttar Pradesh,232401,16200)})
+(Samsung,{(Samsung,Super,14,Maharashtra,619082,9200),(Samsung,Super,14,Maharashtra,619082,9200),(Samsung,Super,14,Maharashtra,619082,9200),(Samsung,Decent,16,Kerala,922401,12200),(Samsung,Optima,14,Madhya Pradesh,132401,14200),(Samsung,Optima,14,Madhya Pradesh,132401,14200),(Samsung,Optima,14,Madhya Pradesh,132401,14200)})
+
+
+grunt> X = foreach B generate group,MIN(A.price);
+grunt> dump X;
+cess : 1
+(NA,16200)
+(Zen,9200)
+(Akai,12200)
+(Lava,24200)
+(Onida,12200)
+(Samsung,9200)
+grunt> 
+====================================
+5]MAX
+It is used to compute the maximum of the numeric values or chararrays in a single-column bag. MAX requires a preceding GROUP ALL statement for global maximums and a GROUP BY statement for group maximums.
+Syntax
+MAX(expression)
+An expression with data types int, long, float, double, or chararray.
+grunt> dump B;
+cess : 1
+(NA,{(NA,Lucid,18,Uttar Pradesh,232401,16200)})
+(Zen,{(Zen,Super,14,Maharashtra,619082,9200),(Zen,Super,14,Maharashtra,619082,9200)})
+(Akai,{(Akai,Decent,16,Kerala,922401,12200)})
+(Lava,{(Lava,Attention,20,Assam,454601,24200),(Lava,Attention,20,Assam,454601,24200),(Lava,Attention,20,Assam,454601,24200)})
+(Onida,{(Onida,Lucid,18,Uttar Pradesh,232401,16200),(Onida,Lucid,18,Uttar Pradesh,232401,16200),(Onida,NA,16,Kerala,922401,12200),(Onida,Decent,14,Uttar Pradesh,232401,16200)})
+(Samsung,{(Samsung,Super,14,Maharashtra,619082,9200),(Samsung,Super,14,Maharashtra,619082,9200),(Samsung,Super,14,Maharashtra,619082,9200),(Samsung,Decent,16,Kerala,922401,12200),(Samsung,Optima,14,Madhya Pradesh,132401,14200),(Samsung,Optima,14,Madhya Pradesh,132401,14200),(Samsung,Optima,14,Madhya Pradesh,132401,14200)})
+
+
+grunt> X = foreach B generate group,MAX(A.price);
+grunt> dump X;
+(NA,16200)
+(Zen,9200)
+(Akai,12200)
+(Lava,24200)
+(Onida,16200)
+(Samsung,14200)
+===================================================================
+6]LIMIT
+It is used to limit the number of output tuples. If the specified number of output tuples is equal to or exceeds the number of tuples in the relation, the output will include all tuples in the relation.
+Syntax
+alias = LIMIT alias n
+where alias=name of relation
+n=number of tuples
+
+
+grunt> B = limit A 5;
+grunt> dump B;
+(Samsung,Optima,14,Madhya Pradesh,132401,14200)
+(Onida,Lucid,18,Uttar Pradesh,232401,16200)
+(Akai,Decent,16,Kerala,922401,12200)
+(Lava,Attention,20,Assam,454601,24200)
+(Zen,Super,14,Maharashtra,619082,9200)
+======================
+7]STORE
+It is used to run (execute) Pig Latin statements and save (persist) results to the file system.
+Syntax
+STORE alias INTO 'directory' [USING function];
+Alias=name of relation
+INTO=Required keyword
+‘directory’= The name of the storage directory, in quotes.
+USING Keyword. It is used to name the store function.
+If the USING clause is omitted, the default store function PigStorage is used.
+Function: the store function
+
+grunt> store A into '/home/acadgild/new_tele' using PigStorage(',');
+
+[acadgild@localhost ~]$ hadoop fs -cat /home/acadgild/new_tele/part-m-00000
+17/10/29 14:19:43 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Samsung,Optima,14,Madhya Pradesh,132401,14200
+Onida,Lucid,18,Uttar Pradesh,232401,16200
+Akai,Decent,16,Kerala,922401,12200
+Lava,Attention,20,Assam,454601,24200
+Zen,Super,14,Maharashtra,619082,9200
+Samsung,Optima,14,Madhya Pradesh,132401,14200
+Onida,Lucid,18,Uttar Pradesh,232401,16200
+Onida,Decent,14,Uttar Pradesh,232401,16200
+Onida,NA,16,Kerala,922401,12200
+Lava,Attention,20,Assam,454601,24200
+Zen,Super,14,Maharashtra,619082,9200
+Samsung,Optima,14,Madhya Pradesh,132401,14200
+NA,Lucid,18,Uttar Pradesh,232401,16200
+Samsung,Decent,16,Kerala,922401,12200
+Lava,Attention,20,Assam,454601,24200
+Samsung,Super,14,Maharashtra,619082,9200
+Samsung,Super,14,Maharashtra,619082,9200
+Samsung,Super,14,Maharashtra,619082,9200
+[acadgild@localhost ~]$ 
+
+
+
+=======================
+8]distinct
+ It is used to remove duplicate tuples in a relation.
+Syntax
+alias = DISTINCT alias [PARALLEL n]; 
+alias=name of relation
+PARALLEL n= Increase the parallelism of a job by specifying the number of reduce tasks, n. The default value for n is 1 (one reduce task)
+
+grunt> A = load '/vishnu/television.txt' using PigStorage ('|') as (cmp:chararray,mod:chararray,size:int,state:chararray,pin:long,price:long);
+
+(Samsung,Optima,14,Madhya Pradesh,132401,14200)
+(Onida,Lucid,18,Uttar Pradesh,232401,16200)
+(Akai,Decent,16,Kerala,922401,12200)
+(Lava,Attention,20,Assam,454601,24200)
+(Zen,Super,14,Maharashtra,619082,9200)
+(Samsung,Optima,14,Madhya Pradesh,132401,14200)
+(Onida,Lucid,18,Uttar Pradesh,232401,16200)
+(Onida,Decent,14,Uttar Pradesh,232401,16200)
+(Onida,NA,16,Kerala,922401,12200)
+(Lava,Attention,20,Assam,454601,24200)
+(Zen,Super,14,Maharashtra,619082,9200)
+(Samsung,Optima,14,Madhya Pradesh,132401,14200)
+(NA,Lucid,18,Uttar Pradesh,232401,16200)
+(Samsung,Decent,16,Kerala,922401,12200)
+(Lava,Attention,20,Assam,454601,24200)
+(Samsung,Super,14,Maharashtra,619082,9200)
+(Samsung,Super,14,Maharashtra,619082,9200)
+(Samsung,Super,14,Maharashtra,619082,9200)
+
+
+
+grunt> B = distinct A;
+grunt> dump B;
+ess : 1
+(NA,Lucid,18,Uttar Pradesh,232401,16200)
+(Zen,Super,14,Maharashtra,619082,9200)
+(Akai,Decent,16,Kerala,922401,12200)
+(Lava,Attention,20,Assam,454601,24200)
+(Onida,NA,16,Kerala,922401,12200)
+(Onida,Lucid,18,Uttar Pradesh,232401,16200)
+(Onida,Decent,14,Uttar Pradesh,232401,16200)
+(Samsung,Super,14,Maharashtra,619082,9200)
+(Samsung,Decent,16,Kerala,922401,12200)
+(Samsung,Optima,14,Madhya Pradesh,132401,14200)
+grunt> 
+===========================================
+9]Flatten
+The FLATTEN operator changes the structure of tuples and bags in a way that a UDF cannot. Flatten un-nests tuples as well as bags. 
+For tuples, flatten substitutes the fields of a tuple in place of the tuple. For example, consider a relation that has a tuple of the form (a, (b, c)). The expression GENERATE $0, flatten($1), will cause that tuple to become (a, b, c).
+For bags, the situation becomes more complicated. When we un-nest a bag, we create new tuples. If we have a relation that is made up of tuples of the form ({(b,c),(d,e)}) and we apply GENERATE flatten($0), we end up with two tuples (b,c) and (d,e). When we remove a level of nesting in a bag, sometimes we cause a cross product to happen. For example, consider a relation that has a tuple of the form (a, {(b,c), (d,e)}), commonly produced by the GROUP operator. If we apply the expression GENERATE $0, flatten($1) to this tuple, we will create new tuples: (a, b, c) and (a, d, e).
+Syntax
+{(data_type) |  (tuple(data_type))  | (bag{tuple(data_type)}) | (map[]) } field
+data_type-The data type you want to cast to, enclosed in parentheses.
+Field-The field whose type we want to change.
+
+grunt> A = load '/vishnu/television.txt' using PigStorage ('|') as (cmp:chararray,mod:chararray,size:int,state:chararray,pin:long,price:long);
+
+(Samsung,Optima,14,Madhya Pradesh,132401,14200)
+(Onida,Lucid,18,Uttar Pradesh,232401,16200)
+(Akai,Decent,16,Kerala,922401,12200)
+(Lava,Attention,20,Assam,454601,24200)
+(Zen,Super,14,Maharashtra,619082,9200)
+(Samsung,Optima,14,Madhya Pradesh,132401,14200)
+(Onida,Lucid,18,Uttar Pradesh,232401,16200)
+(Onida,Decent,14,Uttar Pradesh,232401,16200)
+(Onida,NA,16,Kerala,922401,12200)
+(Lava,Attention,20,Assam,454601,24200)
+(Zen,Super,14,Maharashtra,619082,9200)
+(Samsung,Optima,14,Madhya Pradesh,132401,14200)
+(NA,Lucid,18,Uttar Pradesh,232401,16200)
+(Samsung,Decent,16,Kerala,922401,12200)
+(Lava,Attention,20,Assam,454601,24200)
+(Samsung,Super,14,Maharashtra,619082,9200)
+(Samsung,Super,14,Maharashtra,619082,9200)
+(Samsung,Super,14,Maharashtra,619082,9200)
+
+grunt> B = group A by cmp;
+grunt> dump B;
+(NA,{(NA,Lucid,18,Uttar Pradesh,232401,16200)})
+(Zen,{(Zen,Super,14,Maharashtra,619082,9200),(Zen,Super,14,Maharashtra,619082,9200)})
+(Akai,{(Akai,Decent,16,Kerala,922401,12200)})
+(Lava,{(Lava,Attention,20,Assam,454601,24200),(Lava,Attention,20,Assam,454601,24200),(Lava,Attention,20,Assam,454601,24200)})
+(Onida,{(Onida,Lucid,18,Uttar Pradesh,232401,16200),(Onida,Lucid,18,Uttar Pradesh,232401,16200),(Onida,NA,16,Kerala,922401,12200),(Onida,Decent,14,Uttar Pradesh,232401,16200)})
+(Samsung,{(Samsung,Super,14,Maharashtra,619082,9200),(Samsung,Super,14,Maharashtra,619082,9200),(Samsung,Super,14,Maharashtra,619082,9200),(Samsung,Decent,16,Kerala,922401,12200),(Samsung,Optima,14,Madhya Pradesh,132401,14200),(Samsung,Optima,14,Madhya Pradesh,132401,14200),(Samsung,Optima,14,Madhya Pradesh,132401,14200)})
+
+grunt> C = foreach B generate group,A.cmp;
+grunt> dump C;
+cess : 1
+(NA,{(NA)})
+(Zen,{(Zen),(Zen)})
+(Akai,{(Akai)})
+(Lava,{(Lava),(Lava),(Lava)})
+(Onida,{(Onida),(Onida),(Onida),(Onida)})
+(Samsung,{(Samsung),(Samsung),(Samsung),(Samsung),(Samsung),(Samsung),(Samsung)})
+grunt> 
+
+grunt> D = foreach C generate group,FLATTEN($1);
+grunt> dump D;
+
+(NA,NA)
+(Zen,Zen)
+(Zen,Zen)
+(Akai,Akai)
+(Lava,Lava)
+(Lava,Lava)
+(Lava,Lava)
+(Onida,Onida)
+(Onida,Onida)
+(Onida,Onida)
+(Onida,Onida)
+(Samsung,Samsung)
+(Samsung,Samsung)
+(Samsung,Samsung)
+(Samsung,Samsung)
+(Samsung,Samsung)
+(Samsung,Samsung)
+(Samsung,Samsung)
+=====================
+10].IsEmpty
+It checks if a bag or map is empty (has no data). The function can be used to filter data.
+Syntax
+IsEmpty(expression)
+An expression with any datatype.
+
+grunt> A = load '/home/acadgild/vishnu/data1.txt' using PigStorage(' ') as(id:int,age:int);
+
+grunt> dump A;
+(1,35)
+(2,36)
+
+ B = load '/vishnu/dat21.txt' using PigStorage(' ') as(age:int,sex:chararray);
+
+grunt> dump B;
+(35,Male)
+(39,Female)
+
+grunt> C = cogroup A by age,B by age;
+grunt> dump c;
+(35,{(1,35)},{(35,Male)})
+(36,{(2,36)},{})
+(39,{},{(39,Female)})
+grunt> 
+
+grunt> D = filter C by IsEmpty(A);
+grunt> dump D;
+(39,{},{(39,Female)})
+
+
